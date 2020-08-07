@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#1B1B1B</color>
+    <color name="colorAccent">#FF7676</color>
+
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorWhiteTransparent">#B3FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorRed">#DC3654</color>
+
+    <color name="colorTransparent">#00000000</color>
+    <color name="colorGradientOverlay">#CC000000</color>
+    <color name="colorHover">#66FFFFFF</color>
+
+    <color name="colorHeartPink">#FF00B8</color>
+    <color name="colorHeartRed">#FF5555</color>
+    <color name="colorHeartViolet">#BB86FF</color>
+    <color name="colorHeartGold">#FFE249</color>
+</resources>

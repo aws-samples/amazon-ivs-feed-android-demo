@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="currentTime"
+            type="Long" />
+
+        <variable
+            name="overlayHidden"
+            type="Boolean" />
+
+        <variable
+            name="isMuted"
+            type="Boolean" />
+
+        <variable
+            name="data"
+            type="com.amazonaws.ivs.player.scrollablefeed.data.StreamModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/stream_item"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBlack"
+        android:keepScreenOn="true">
+
+        <ImageView
+            android:id="@+id/background_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:alpha="0.4"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            android:visibility="invisible" />
+
+        <SurfaceView
+            android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/pb_buffering_small"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:indeterminateOnly="true"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:setCustomDrawable="@{data.metadata.userColors.secondaryColor()}"
+            tools:visibility="visible" />
+
+        <FrameLayout
+            android:id="@+id/overlay_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@{data.metadata.userColors.primaryColor()}"
+            android:visibility="@{overlayHidden ? View.INVISIBLE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/loading_image"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                app:loadImage="@{data.metadata.userAvatar}" />
+
+            <ProgressBar
+                android:id="@+id/pb_buffering"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateOnly="true"
+                android:scaleType="center"
+                android:visibility="gone"
+                app:setCustomDrawable="@{data.metadata.userColors.secondaryColor()}"
+                tools:visibility="visible" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/volume_root"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/volume_view"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_margin="20dp"
+                android:background="@drawable/ic_volume_off"
+                app:changeVolumeBackground="@{isMuted}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </FrameLayout>
+
+        <include
+            android:id="@+id/title_view"
+            layout="@layout/stream_title_view"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            app:currentTime="@{currentTime}"
+            app:data="@{data}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

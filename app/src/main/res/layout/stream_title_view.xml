@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="currentTime"
+            type="Long" />
+
+        <variable
+            name="data"
+            type="com.amazonaws.ivs.player.scrollablefeed.data.StreamModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_background"
+        android:paddingBottom="@dimen/dimen_default">
+
+        <TextView
+            android:id="@+id/stream_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_default"
+            android:fontFamily="sans-serif-medium"
+            android:text="@{data.metadata.streamTitle}"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/title_text_size"
+            app:layout_constraintBottom_toTopOf="@+id/avatar_image"
+            tools:layout_editor_absoluteX="0dp"
+            tools:text="Cooking Now-to EP17: Making easy, no-fry samosas in my home kitchen" />
+
+        <ImageView
+            android:id="@+id/avatar_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="@dimen/dimen_default"
+            android:contentDescription="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:loadImage="@{data.metadata.userAvatar}"
+            tools:background="@color/colorAccent" />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@{data.metadata.userName}"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/big_text_size"
+            app:layout_constraintBottom_toTopOf="@+id/status"
+            app:layout_constraintStart_toEndOf="@+id/avatar_image"
+            tools:text="Em's Kitchen" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/txt_live"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/medium_text_size"
+            app:firstCharColor="@{@color/colorRed}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/avatar_image"
+            app:layout_constraintTop_toTopOf="@+id/avatar_image" />
+
+        <TextView
+            android:id="@+id/status_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textColor="@color/colorWhiteTransparent"
+            android:textSize="@dimen/medium_text_size"
+            app:activeTime="@{data.stream.startTime}"
+            app:currentTime="@{currentTime}"
+            app:layout_constraintBottom_toBottomOf="@+id/status"
+            app:layout_constraintStart_toEndOf="@+id/status"
+            app:layout_constraintTop_toTopOf="@+id/status"
+            tools:text="for 5m" />
+
+        <FrameLayout
+            android:id="@+id/share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/status"
+            app:layout_constraintEnd_toStartOf="@+id/favorite"
+            app:layout_constraintTop_toTopOf="@+id/user_name">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="@dimen/dimen_default"
+                android:layout_marginTop="@dimen/dimen_default"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="@dimen/dimen_default"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_share" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/status"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/user_name">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="@dimen/dimen_default"
+                android:layout_marginEnd="@dimen/dimen_default"
+                android:layout_marginBottom="@dimen/dimen_default"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_favorite" />
+        </FrameLayout>
+
+        <com.amazonaws.ivs.player.scrollablefeed.views.heartView.HeartLayout
+            android:id="@+id/heart_view"
+            android:layout_width="100dp"
+            android:layout_height="0dp"
+            app:initX="55dp"
+            app:initY="40dp"
+            app:layout_constraintBottom_toBottomOf="@+id/favorite"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:xRand="10dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
