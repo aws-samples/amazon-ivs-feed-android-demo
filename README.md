@@ -2,6 +2,8 @@
 
 A demo Android phone application intended as an educational tool for demonstrating how Amazon IVS can be used to build a scrolling feed of live streams.
 
+![Android phone running the demo app](app-screenshot.png)
+
 **This project is intended for education purposes only and not for production usage.**
 
 This is a server-less Android application that shows a list of Amazon IVS streams in a scrolling feed. The demo is written in [Kotlin](https://developer.android.com/kotlin) and showcases how customers can load and play Amazon IVS streams in a feed format.
