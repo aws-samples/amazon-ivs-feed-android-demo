@@ -1,110 +1,108 @@
 package com.amazonaws.ivs.player.scrollablefeed.viewModels
 
-import android.app.Application
+import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.view.Surface
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.amazonaws.ivs.player.MediaPlayer
 import com.amazonaws.ivs.player.Player
-import com.amazonaws.ivs.player.scrollablefeed.common.Configuration.TAG
+import com.amazonaws.ivs.player.scrollablefeed.common.ConsumableLiveData
 import com.amazonaws.ivs.player.scrollablefeed.common.setListener
+import timber.log.Timber
 
-class MainViewModel(private val context: Application) : ViewModel() {
+class MainViewModel : ViewModel() {
 
     var player: MediaPlayer? = null
     private var playerListener: Player.Listener? = null
 
-    val buffering = MutableLiveData<Boolean>()
-    val playerParamsChanged = MutableLiveData<Pair<Int, Int>>()
-    val errorHappened = MutableLiveData<Pair<String, String>>()
-    val isMuted = MutableLiveData<Boolean>()
-    val isPlaying = MutableLiveData<Boolean>()
-    val isIdle = MutableLiveData<Boolean>()
-    val isLandscape = MutableLiveData<Boolean>()
+    val buffering = ConsumableLiveData<Boolean>()
+    val playerParamsChanged = ConsumableLiveData<Pair<Int, Int>>()
+    val errorHappened = ConsumableLiveData<Pair<String, String>>()
+    val isMuted = ConsumableLiveData<Boolean>()
+    val isPlaying = ConsumableLiveData<Boolean>()
+    val isIdle = ConsumableLiveData<Boolean>()
+    val isLandscape = ConsumableLiveData<Boolean>()
 
-    init {
-        initPlayer()
-    }
-
-    private fun initPlayer() {
+    fun initPlayer(context: Context) {
         // Media player initialization
         player = MediaPlayer(context)
 
         player?.setListener(
             onVideoSizeChanged = { width, height ->
-                Log.d(TAG, "Video size changed: $width $height")
-                isLandscape.value = width >= height
-                playerParamsChanged.value = Pair(width, height)
+                Timber.d("Video size changed: $width $height")
+                isLandscape.postConsumable(width >= height)
+                playerParamsChanged.postConsumable(Pair(width, height))
             },
             onStateChanged = { state ->
-                Log.d(TAG, "State changed: $state")
-                isIdle.value = false
+                Timber.d("State changed: $state")
+                isIdle.postConsumable(false)
                 when (state) {
                     Player.State.BUFFERING -> {
-                        buffering.value = true
+                        buffering.postConsumable(true)
                     }
                     else -> {
-                        buffering.value = false
-                        isPlaying.value = false
+                        buffering.postConsumable(false)
+                        isPlaying.postConsumable(false)
                         if (state == Player.State.PLAYING) {
-                            isPlaying.value = true
+                            isPlaying.postConsumable(true)
                         }
 
                         if (state == Player.State.IDLE) {
-                            isIdle.value = true
+                            isIdle.postConsumable(true)
                         }
                     }
                 }
             },
             onError = { exception ->
-                Log.d(TAG, "Error happened: $exception")
-                errorHappened.value = Pair(exception.code.toString(), exception.errorMessage)
+                Timber.d("Error happened: ${exception.code}, $exception")
+                if (exception.code != 0) {
+                    errorHappened.postConsumable(Pair(exception.code.toString(), exception.errorMessage))
+                }
             }
         )
     }
 
     private fun playerLoadStream(uri: Uri) {
-        Log.d(TAG, "Loading stream URI: $uri")
+       Timber.d("Loading stream URI: $uri")
         // Loads the specified stream
         player?.load(uri)
         player?.play()
     }
 
-    fun playerStart(surface: Surface, link : String) {
-        Log.d(TAG, "Starting player")
+    fun playerStart(surface: Surface, link: String) {
+       Timber.d("Starting player")
         mute(true)
         updateSurface(surface)
         playerLoadStream(Uri.parse(link))
         play()
     }
 
-    fun updateSurface(surface: Surface?) {
-        Log.d(TAG, "Updating player surface: $surface")
-        // Sets the Surface to use for rendering video
-        player?.setSurface(surface)
-    }
-
     fun mute(mute: Boolean) {
-        isMuted.value = mute
+        isMuted.postConsumable(mute)
         player?.isMuted = mute
     }
 
     fun play() {
-        Log.d(TAG, "Starting playback")
+       Timber.d("Starting playback")
         // Starts or resumes playback of the stream.
         player?.play()
     }
 
     fun pause() {
-        Log.d(TAG, "Pausing playback")
+       Timber.d("Pausing playback")
         // Pauses playback of the stream.
         player?.pause()
     }
 
     fun release() {
-        Log.d(TAG, "Releasing player")
+       Timber.d("Releasing player")
+        errorHappened.consume()
+        playerParamsChanged.consume()
+        isIdle.consume()
+        isLandscape.consume()
+        isMuted.consume()
+        isPlaying.consume()
+        buffering.consume()
         // Removes a playback state listener
         playerListener?.let { player?.removeListener(it) }
         // Releases the player instance
@@ -112,6 +110,9 @@ class MainViewModel(private val context: Application) : ViewModel() {
         player = null
     }
 
-    fun isPlayerMuted() : Boolean? = player?.isMuted
+    fun isPlayerMuted(): Boolean? = player?.isMuted
 
+    private fun updateSurface(surface: Surface) {
+        player?.setSurface(surface)
+    }
 }

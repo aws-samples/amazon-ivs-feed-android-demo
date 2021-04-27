@@ -5,8 +5,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.amazonaws.ivs.player.scrollablefeed.views.heartView.HeartLayout
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 
 object BindingAdapters {
 
@@ -19,7 +18,7 @@ object BindingAdapters {
     @BindingAdapter("loadImage")
     @JvmStatic
     fun setImage(view: ImageView, url: String) {
-        Picasso.get().load(url).into(view)
+        Glide.with(view).load(url).into(view)
     }
 
     @BindingAdapter("setCustomDrawable")

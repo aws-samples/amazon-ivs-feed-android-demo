@@ -1,15 +1,12 @@
 package com.amazonaws.ivs.player.scrollablefeed.common
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.View
-import android.view.Window
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
@@ -18,29 +15,28 @@ import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import com.amazonaws.ivs.player.scrollablefeed.R
-import kotlinx.android.synthetic.main.view_dialog.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.IOException
 
 private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
 fun launchMain(block: suspend CoroutineScope.() -> Unit) = mainScope.launch(
-    context = CoroutineExceptionHandler { _, e -> Log.d(Configuration.TAG, "Coroutine failed ${e.localizedMessage}") },
+    context = CoroutineExceptionHandler { _, e ->
+        Timber.d("Coroutine failed ${e.localizedMessage}")
+    },
     block = block
 )
 
-fun Activity.showDialog(title: String, message: String) {
-    val dialog = Dialog(this).apply {
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setCancelable(false)
-        setContentView(R.layout.view_dialog)
-    }
-    dialog.title.text = getString(R.string.error_happened_template, title)
-    dialog.message.text = message
-    dialog.dismiss_btn.setOnClickListener {
-        dialog.dismiss()
-    }
-    dialog.show()
+fun Activity.showErrorDialog() {
+    MaterialAlertDialogBuilder(this, R.style.AlertDialog)
+        .setTitle(resources.getString(R.string.error))
+        .setMessage(resources.getString(R.string.error_dialog_message))
+        .setPositiveButton(resources.getString(R.string.close)) { dialog, _ ->
+            dialog.dismiss()
+        }
+        .show()
 }
 
 /**
@@ -125,14 +121,13 @@ fun Context.readJsonAsset(fileName: String): String {
  * @param title title message
  * @param url stream url
  */
-fun Activity.sendChooserIntent(title: String, url: String) {
+fun Activity.startShareIntent(title: String, url: String) {
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(Intent.EXTRA_TEXT, url)
         putExtra(Intent.EXTRA_TITLE, title)
         type = "text/plain"
     }
-
     val shareIntent = Intent.createChooser(sendIntent, null)
     startActivity(shareIntent)
 }

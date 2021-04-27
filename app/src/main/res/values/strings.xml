@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Scrollable Feed</string>
-    <string name="dialog_ok">OK</string>
-    <string name="error_happened_template">Error happened (Code - %1$s)</string>
     <string name="txt_live">&#11044; LIVE</string>
+    <string name="error">Error</string>
+    <string name="error_dialog_message">We\'re sorry, but something went wrong. Please try again.</string>
+    <string name="close">Close</string>
 </resources>

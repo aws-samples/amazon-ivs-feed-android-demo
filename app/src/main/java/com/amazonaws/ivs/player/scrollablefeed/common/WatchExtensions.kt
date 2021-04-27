@@ -4,12 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Point
+import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
-import android.util.Log
 import android.view.PixelCopy
 import android.view.SurfaceView
 import android.view.View
@@ -19,11 +20,6 @@ import android.widget.TextView
 import androidx.annotation.WorkerThread
 import androidx.core.content.res.ResourcesCompat
 import com.amazonaws.ivs.player.scrollablefeed.R
-import com.amazonaws.ivs.player.scrollablefeed.activities.adapters.MainAdapter
-import com.amazonaws.ivs.player.scrollablefeed.common.Configuration.JSON_FILE_NAME
-import com.amazonaws.ivs.player.scrollablefeed.common.Configuration.TAG
-import com.amazonaws.ivs.player.scrollablefeed.data.StreamsModel
-import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
@@ -36,7 +32,7 @@ import kotlin.math.abs
  */
 suspend fun Activity.initBlurredBackground(surface: SurfaceView, background: ImageView) {
     delay(Configuration.BACKGROUND_DELAY)
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         runOnUiThread {
             if (surface.holder.surface.isValid) {
                 val surfaceBitmap =
@@ -55,7 +51,7 @@ suspend fun Activity.initBlurredBackground(surface: SurfaceView, background: Ima
                             background.fadeIn()
                         }
                     },
-                    Handler()
+                    Handler(Looper.getMainLooper())
                 )
             }
         }
@@ -133,7 +129,12 @@ fun Bitmap.scaleBitmap(maxWidth: Int, maxHeight: Int): Bitmap {
  */
 fun SurfaceView.setPortraitDimens(windowManager: WindowManager, width: Int, height: Int) {
     val point = Point()
-    windowManager.defaultDisplay.getSize(point)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        context.display?.getRealSize(point)
+    } else {
+        @Suppress("DEPRECATION")
+        windowManager.defaultDisplay.getSize(point)
+    }
     val aspectRatio = width.toFloat() / height.toFloat()
     val portraitWidth = point.y * aspectRatio
     if (portraitWidth >= point.x) {
@@ -143,20 +144,6 @@ fun SurfaceView.setPortraitDimens(windowManager: WindowManager, width: Int, heig
         val portraitHeight = point.x / aspectRatio
         layoutParams.width = point.x
         layoutParams.height = portraitHeight.toInt()
-    }
-}
-
-/**
- * Adapter items from JSON asset file
- * @param context Context
- */
-fun MainAdapter.setItems(context: Context) {
-    try {
-        val data = Gson().fromJson(context.readJsonAsset(JSON_FILE_NAME), StreamsModel::class.java)
-        items = data.streams
-        Log.d(TAG, "Stream data: $data")
-    } catch (exception: Exception) {
-        Log.d(TAG, "Error happened: $exception")
     }
 }
 
@@ -175,7 +162,8 @@ fun TextView.setActiveTime(time: String, currentTime: Long) {
         val diff = abs(currentTime - dateFormat.time)
         val days = TimeUnit.MILLISECONDS.toDays(diff)
         val hours = TimeUnit.MILLISECONDS.toHours(diff - TimeUnit.DAYS.toMillis(days))
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(diff - TimeUnit.DAYS.toMillis(days) - TimeUnit.HOURS.toMillis(hours))
+        val minutes =
+            TimeUnit.MILLISECONDS.toMinutes(diff - TimeUnit.DAYS.toMillis(days) - TimeUnit.HOURS.toMillis(hours))
 
         if (days > 0) {
             message.append(" ${days}d")

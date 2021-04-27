@@ -3,8 +3,6 @@ package com.amazonaws.ivs.player.scrollablefeed.common
 import com.amazonaws.ivs.player.scrollablefeed.R
 
 object Configuration {
-    const val TAG = "scrollableFeed"
-
     const val JSON_FILE_NAME = "streams.json"
 
     const val ANIMATION_DURATION = 200L
@@ -19,9 +17,9 @@ object Configuration {
     const val HEART_ANIMATION_DURATION = 3000L
 
     val HEART_COLORS = listOf(
-        R.color.colorHeartGold,
-        R.color.colorHeartRed,
-        R.color.colorHeartPink,
-        R.color.colorHeartViolet
+        R.color.yellow_accent_color,
+        R.color.primary_red_accent_color,
+        R.color.pink_accent_color,
+        R.color.violet_accent_color
     )
 }

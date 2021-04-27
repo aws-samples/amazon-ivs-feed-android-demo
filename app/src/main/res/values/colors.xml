@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFFFFF</color>
-    <color name="colorPrimaryDark">#1B1B1B</color>
-    <color name="colorAccent">#FF7676</color>
-
-    <color name="colorWhite">#FFFFFF</color>
-    <color name="colorWhiteTransparent">#B3FFFFFF</color>
-    <color name="colorBlack">#000000</color>
-    <color name="colorRed">#DC3654</color>
-
-    <color name="colorTransparent">#00000000</color>
-    <color name="colorGradientOverlay">#CC000000</color>
-    <color name="colorHover">#66FFFFFF</color>
-
-    <color name="colorHeartPink">#FF00B8</color>
-    <color name="colorHeartRed">#FF5555</color>
-    <color name="colorHeartViolet">#BB86FF</color>
-    <color name="colorHeartGold">#FFE249</color>
+    <color name="primary_bg_color">#16181D</color>
+    <color name="primary_color">#FFFFFF</color>
+    <color name="primary_color_dark">#1B1B1B</color>
+    <color name="orange_accent_color">#FF7676</color>
+    <color name="white_transparent_color">#B3FFFFFF</color>
+    <color name="black_color">#000000</color>
+    <color name="primary_red_accent_color">#FF5555</color>
+    <color name="secondary_red_accent_color">#DC3654</color>
+    <color name="transparent_color">#00000000</color>
+    <color name="gradient_overlay_color">#CC000000</color>
+    <color name="pink_accent_color">#FF00B8</color>
+    <color name="violet_accent_color">#BB86FF</color>
+    <color name="yellow_accent_color">#FFE249</color>
+    <color name="alert_dialog_background">#4C4E53</color>
+    <color name="primary_text_color">#FFFFFF</color>
+    <color name="secondary_text_color">#D7D7D7</color>
 </resources>
