@@ -1,4 +1,2 @@
-include ':library-release'
-include ':library-debug'
 include ':app'
 rootProject.name = "Scrollable Feed"

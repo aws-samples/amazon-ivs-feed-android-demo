@@ -5,12 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.amazonaws.ivs.player.scrollablefeed.common.Configuration
 import com.amazonaws.ivs.player.scrollablefeed.data.StreamModel
 import com.amazonaws.ivs.player.scrollablefeed.databinding.StreamItemBinding
-import com.amazonaws.ivs.player.scrollablefeed.viewModels.MainViewModel
 import kotlin.properties.Delegates
 
 class MainAdapter(
@@ -19,8 +18,8 @@ class MainAdapter(
     private val lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<MainAdapter.ViewHolder>() {
 
-    var items: List<StreamModel> by Delegates.observable(emptyList()) { _, _, _ ->
-        notifyDataSetChanged()
+    var items: List<StreamModel> by Delegates.observable(emptyList()) { _, old, new ->
+        DiffUtil.calculateDiff(StreamDiff(old, new)).dispatchUpdatesTo(this)
     }
 
     val isOverlayHidden = MutableLiveData<Boolean>()
@@ -67,20 +66,20 @@ class MainAdapter(
             }
         }
 
-        isOverlayHidden.observe(lifecycleOwner, Observer { hidden ->
+        isOverlayHidden.observe(lifecycleOwner, { hidden ->
             holder.binding.backgroundView.setImageBitmap(null)
             holder.binding.overlayHidden = hidden
         })
 
-        currentTime.observe(lifecycleOwner, Observer { time ->
+        currentTime.observe(lifecycleOwner, { time ->
             holder.binding.currentTime = time
         })
 
-        isMuted.observe(lifecycleOwner, Observer { muted ->
+        isMuted.observe(lifecycleOwner, { muted ->
             holder.binding.isMuted = muted
         })
 
-        buffering.observe(lifecycleOwner, Observer { buffering ->
+        buffering.observe(lifecycleOwner, { buffering ->
             holder.binding.pbBuffering.visibility = if (buffering) View.VISIBLE else View.GONE
             holder.binding.pbBufferingSmall.visibility = if (buffering) View.VISIBLE else View.GONE
         })
@@ -88,4 +87,19 @@ class MainAdapter(
 
     inner class ViewHolder(val binding: StreamItemBinding) : RecyclerView.ViewHolder(binding.root)
 
+    inner class StreamDiff(
+        private val old: List<StreamModel>,
+        private val new: List<StreamModel>
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize() = old.size
+
+        override fun getNewListSize() = new.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+            old[oldItemPosition].id == new[newItemPosition].id
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+            old[oldItemPosition] == new[newItemPosition]
+    }
 }

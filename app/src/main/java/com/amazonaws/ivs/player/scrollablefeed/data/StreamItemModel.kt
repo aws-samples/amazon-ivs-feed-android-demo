@@ -1,5 +1,8 @@
 package com.amazonaws.ivs.player.scrollablefeed.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class StreamItemModel(
     val channelArn: String,
     val health: String,

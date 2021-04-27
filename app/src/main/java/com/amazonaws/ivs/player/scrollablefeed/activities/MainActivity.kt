@@ -2,47 +2,46 @@ package com.amazonaws.ivs.player.scrollablefeed.activities
 
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
+import android.os.Looper
 import android.view.SurfaceView
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.amazonaws.ivs.player.ViewUtil
-import com.amazonaws.ivs.player.scrollablefeed.R
+import com.amazonaws.ivs.player.scrollablefeed.App
 import com.amazonaws.ivs.player.scrollablefeed.activities.adapters.MainAdapter
 import com.amazonaws.ivs.player.scrollablefeed.common.*
-import com.amazonaws.ivs.player.scrollablefeed.common.Configuration.TAG
+import com.amazonaws.ivs.player.scrollablefeed.data.StreamsModel
+import com.amazonaws.ivs.player.scrollablefeed.databinding.ActivityMainBinding
 import com.amazonaws.ivs.player.scrollablefeed.viewModels.MainViewModel
 import com.amazonaws.ivs.player.scrollablefeed.views.heartView.HeartLayout
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.delay
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: MainViewModel by lazyViewModel {
-        MainViewModel(application)
-    }
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by lazyViewModel(
+        { application as App },
+        { MainViewModel() }
+    )
 
     private val mainAdapter by lazy {
         MainAdapter(
             { viewModel.mute(viewModel.isPlayerMuted() != true) },
-            { url, title -> sendChooserIntent(title, url)},
+            { url, title -> startShareIntent(title, url) },
             this
         )
     }
 
     private var currentPosition: Int = 0
-
     private var surfaceView: SurfaceView? = null
     private var backgroundImageView: ImageView? = null
     private var overlayView: View? = null
     private var heartView: HeartLayout? = null
-
-    private val timerHandler = Handler()
+    private val timerHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = Runnable {
         launchMain {
             setCurrentTime()
@@ -52,70 +51,65 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        initUi()
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        viewModel.playerParamsChanged.observe(this, Observer {
-            Log.d(TAG, "Player layout params changed ${it.first} ${it.second}")
-            if (viewModel.isLandscape.value == true) {
-                ViewUtil.setLayoutParams(surfaceView, it.first, it.second)
-            } else {
-                surfaceView?.setPortraitDimens(windowManager, it.first, it.second)
-            }
-        })
+        viewModel.initPlayer(this)
+        mainAdapter.items = readJsonAsset(Configuration.JSON_FILE_NAME).asObject<StreamsModel>().streams
+        binding.scrollableFeedView.adapter = mainAdapter
 
-        viewModel.isPlaying.observe(this, Observer { isPlaying ->
-            if (isPlaying) {
-                launchMain {
-                    initBlurredBackground(surfaceView as SurfaceView, backgroundImageView as ImageView)
-                }
-                overlayView?.fadeOutLong()
-            }
-        })
-
-        viewModel.buffering.observe(this, Observer { buffering ->
-            mainAdapter.buffering.value = buffering
-        })
-
-        viewModel.isMuted.observe(this, Observer { muted ->
-            mainAdapter.isMuted.value = muted
-        })
-
-        viewModel.isIdle.observe(this, Observer { idle ->
-            if (idle) {
-                mainAdapter.isOverlayHidden.value = false
-            }
-        })
-
-        viewModel.errorHappened.observe(this, Observer { error ->
-            showDialog(error.first, error.second)
-        })
-    }
-
-    private fun initUi() {
-        initAdapter()
         initScroll()
-        PagerSnapHelper().attachToRecyclerView(scrollable_feed_view)
+        PagerSnapHelper().attachToRecyclerView(binding.scrollableFeedView)
         launchMain {
             delay(200)
             initCurrentViews(0)
             playStream()
         }
         startDelay()
-    }
 
-    private fun initAdapter() {
-        mainAdapter.setItems(this)
-        scrollable_feed_view.apply {
-            adapter = mainAdapter
+        viewModel.playerParamsChanged.observeConsumable(this) {
+            surfaceView?.run {
+                if (viewModel.isLandscape.consumedValue == true) {
+                    ViewUtil.setLayoutParams(this, it.first, it.second)
+                } else {
+                    setPortraitDimens(windowManager, it.first, it.second)
+                }
+            }
+        }
+
+        viewModel.isPlaying.observeConsumable(this) { isPlaying ->
+            if (isPlaying) {
+                launchMain {
+                    initBlurredBackground(surfaceView as SurfaceView, backgroundImageView as ImageView)
+                }
+                overlayView?.fadeOutLong()
+            }
+        }
+
+        viewModel.buffering.observeConsumable(this) { buffering ->
+            mainAdapter.buffering.value = buffering
+        }
+
+        viewModel.isMuted.observeConsumable(this) { muted ->
+            mainAdapter.isMuted.value = muted
+        }
+
+        viewModel.isIdle.observeConsumable(this) { idle ->
+            if (idle) {
+                mainAdapter.isOverlayHidden.value = false
+            }
+        }
+
+        viewModel.errorHappened.observeConsumable(this) { error ->
+            showErrorDialog()
         }
     }
 
     private fun initScroll() {
-        val manager = scrollable_feed_view.layoutManager as LinearLayoutManager
+        val manager = binding.scrollableFeedView.layoutManager as LinearLayoutManager
         manager.findFirstCompletelyVisibleItemPosition()
 
-        scrollable_feed_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.scrollableFeedView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val position = manager.findFirstCompletelyVisibleItemPosition()
                 if (position >= 0) {
@@ -133,10 +127,10 @@ class MainActivity : AppCompatActivity() {
     private fun initCurrentViews(position: Int) {
         currentPosition = position
 
-        surfaceView = mainAdapter.items[position].surfaceView
-        backgroundImageView = mainAdapter.items[position].backgroundView
-        overlayView = mainAdapter.items[position].overlayView
-        heartView = mainAdapter.items[position].heartView
+        surfaceView = mainAdapter.items.getOrNull(position)?.surfaceView
+        backgroundImageView = mainAdapter.items.getOrNull(position)?.backgroundView
+        overlayView = mainAdapter.items.getOrNull(position)?.overlayView
+        heartView = mainAdapter.items.getOrNull(position)?.heartView
     }
 
     private fun clearViews() {
@@ -148,9 +142,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun playStream() {
         surfaceView?.holder?.surface?.let {
-            val url = mainAdapter.items[currentPosition].stream.playbackUrl
+            val url = mainAdapter.items.getOrNull(currentPosition)?.stream?.playbackUrl ?: ""
             viewModel.playerStart(it, url)
         }
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 
     private fun startDelay() {
@@ -159,10 +157,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setCurrentTime() {
         mainAdapter.currentTime.value = System.currentTimeMillis()
-    }
-
-    override fun onBackPressed() {
-        finish()
     }
 
     override fun onResume() {
@@ -178,6 +172,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.release()
+        mainAdapter.items = listOf()
     }
-
 }

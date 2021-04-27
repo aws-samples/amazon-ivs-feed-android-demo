@@ -37,3 +37,4 @@ library-release/
 .Trashes
 ehthumbs.db
 Thumbs.db
+/.idea/
