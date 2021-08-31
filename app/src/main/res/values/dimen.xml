@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="dimen_default_medium">10dp</dimen>
     <dimen name="dimen_default">20dp</dimen>
-    <dimen name="dimen_default_big">30dp</dimen>
-
-    <dimen name="small_text_size">12sp</dimen>
     <dimen name="medium_text_size">14sp</dimen>
     <dimen name="big_text_size">16sp</dimen>
-
-    <dimen name="button_height">40dp</dimen>
 
     <!--Heart animation constants-->
     <dimen name="heart_anim_bezier_x_rand">40dp</dimen>
