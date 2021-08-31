@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.errorHappened.observeConsumable(this) { error ->
+        viewModel.errorHappened.observeConsumable(this) {
             showErrorDialog()
         }
     }
