@@ -51,7 +51,6 @@ fun Bitmap.blurBitmap(applicationContext: Context): Bitmap {
             theIntrinsic.forEach(outAlloc)
         }
         outAlloc.copyTo(output)
-
         return output
     } finally {
         renderScript?.finish()
@@ -88,16 +87,12 @@ fun TextView.setActiveTime(time: String, currentTime: Long) {
     val message = StringBuilder("for")
     val pattern = "yyyy-MM-dd hh:mm:ss"
     val date = time.replace("T", " ").replace("Z", " ")
-
     val dateFormat = SimpleDateFormat(pattern, Locale.US).parse(date)
-
     dateFormat?.let {
         val diff = abs(currentTime - dateFormat.time)
         val days = TimeUnit.MILLISECONDS.toDays(diff)
         val hours = TimeUnit.MILLISECONDS.toHours(diff - TimeUnit.DAYS.toMillis(days))
-        val minutes =
-            TimeUnit.MILLISECONDS.toMinutes(diff - TimeUnit.DAYS.toMillis(days) - TimeUnit.HOURS.toMillis(hours))
-
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(diff - TimeUnit.DAYS.toMillis(days) - TimeUnit.HOURS.toMillis(hours))
         if (days > 0) {
             message.append(" ${days}d")
         }
