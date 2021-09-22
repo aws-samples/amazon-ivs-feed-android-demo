@@ -14,7 +14,7 @@ open class App : Application(), ViewModelStoreOwner {
         super.onCreate()
 
         if (BuildConfig.DEBUG) {
-            Timber.plant(LineNumberDebugTree("Amazon_IVS"))
+            Timber.plant(LineNumberDebugTree())
         }
     }
 

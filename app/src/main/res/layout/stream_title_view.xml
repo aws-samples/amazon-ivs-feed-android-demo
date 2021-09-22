@@ -4,21 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <import type="android.view.View" />
-
         <variable
-            name="currentTime"
-            type="Long" />
-
-        <variable
-            name="data"
-            type="com.amazonaws.ivs.player.scrollablefeed.data.StreamModel" />
+            name="stream"
+            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="165dp"
         android:background="@drawable/gradient_background"
         android:paddingBottom="@dimen/dimen_default">
 
@@ -28,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/dimen_default"
             android:fontFamily="sans-serif-medium"
-            android:text="@{data.metadata.streamTitle}"
+            android:text="@{stream.metadata.streamTitle}"
             android:textColor="@color/primary_color"
             android:textSize="@dimen/big_text_size"
             app:layout_constraintBottom_toTopOf="@+id/stream_information"
@@ -51,7 +45,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:loadImage="@{data.metadata.userAvatar}"
+                app:loadImage="@{stream.metadata.userAvatar}"
                 tools:background="@color/orange_accent_color" />
 
             <TextView
@@ -59,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="@{data.metadata.userName}"
+                android:text="@{stream.metadata.userName}"
                 android:textColor="@color/primary_color"
                 android:textSize="@dimen/medium_text_size"
                 app:layout_constraintBottom_toTopOf="@+id/status"
@@ -88,8 +82,8 @@
                 android:layout_marginStart="4dp"
                 android:textColor="@color/white_transparent_color"
                 android:textSize="@dimen/medium_text_size"
-                app:activeTime="@{data.stream.startTime}"
-                app:currentTime="@{currentTime}"
+                app:activeTime="@{stream.stream.startTime}"
+                app:currentTime="@{stream.currentTime}"
                 app:layout_constraintBottom_toBottomOf="@+id/status"
                 app:layout_constraintStart_toEndOf="@+id/status"
                 app:layout_constraintTop_toTopOf="@+id/status"
@@ -135,7 +129,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.amazonaws.ivs.player.scrollablefeed.views.heartView.HeartLayout
+        <com.amazonaws.ivs.player.scrollablefeed.common.heartview.HeartLayout
             android:id="@+id/heart_view"
             android:layout_width="100dp"
             android:layout_height="0dp"

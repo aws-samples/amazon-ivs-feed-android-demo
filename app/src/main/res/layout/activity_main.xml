@@ -1,19 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/scrollable_feed_view"
+    <data>
+        <variable
+            name="itemTop"
+            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamModel" />
+        <variable
+            name="itemCenter"
+            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamModel" />
+        <variable
+            name="itemBottom"
+            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamModel" />
+    </data>
+
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/motion_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="4"
-        tools:listitem="@layout/stream_item" />
+        app:layoutDescription="@xml/main_scene">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <include
+            android:id="@+id/stream_top"
+            layout="@layout/stream_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/stream_center"
+            app:layout_constraintEnd_toEndOf="@id/stream_center"
+            app:layout_constraintStart_toStartOf="@id/stream_center"
+            app:stream="@{itemTop}"
+            app:isCenter="@{false}" />
+
+        <include
+            android:id="@+id/stream_center"
+            layout="@layout/stream_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:stream="@{itemCenter}"
+            app:isCenter="@{true}" />
+
+        <include
+            android:id="@+id/stream_bottom"
+            layout="@layout/stream_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/stream_center"
+            app:layout_constraintStart_toStartOf="@id/stream_center"
+            app:layout_constraintTop_toBottomOf="@id/stream_center"
+            app:stream="@{itemBottom}"
+            app:isCenter="@{false}" />
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
+
+</layout>

@@ -1,4 +1,4 @@
-package com.amazonaws.ivs.player.scrollablefeed.data
+package com.amazonaws.ivs.player.scrollablefeed.models
 
 import kotlinx.serialization.Serializable
 
