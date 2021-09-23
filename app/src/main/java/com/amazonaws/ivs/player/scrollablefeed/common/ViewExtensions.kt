@@ -17,9 +17,11 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import android.graphics.drawable.BitmapDrawable
+import kotlinx.coroutines.delay
 
 fun initBlurredBackground(textureView: TextureView, background: ImageView) = launchMain {
     if (background.hasImage()) return@launchMain
+    delay(SHOW_BACKGROUND_DELAY)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         val surface = Surface(textureView.surfaceTexture!!)
         if (surface.isValid) {

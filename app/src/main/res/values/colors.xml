@@ -15,5 +15,6 @@
     <color name="alert_dialog_background">#4C4E53</color>
     <color name="primary_text_color">#FFFFFF</color>
     <color name="secondary_text_color">#D7D7D7</color>
+    <color name="ripple_color">#777</color>
     <color name="ic_launcher_background">#21242A</color>
 </resources>

@@ -32,6 +32,8 @@ object BindingAdapters {
     @JvmStatic
     fun animateVisibility(view: View, visibility: Int) {
         val alpha = if (visibility == View.VISIBLE) 1f else 0f
-        view.animate().alpha(alpha).start()
+        if (view.alpha != alpha) {
+            view.animate().alpha(alpha).start()
+        }
     }
 }

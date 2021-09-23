@@ -14,7 +14,7 @@ import com.amazonaws.ivs.player.scrollablefeed.models.StreamsModel
 import com.amazonaws.ivs.player.scrollablefeed.databinding.ActivityMainBinding
 import com.amazonaws.ivs.player.scrollablefeed.databinding.StreamItemBinding
 import com.amazonaws.ivs.player.scrollablefeed.models.ScrollDirection
-import com.amazonaws.ivs.player.scrollablefeed.models.StreamModel
+import com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel
 import com.amazonaws.ivs.player.scrollablefeed.ui.viewmodels.MainViewModel
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 && !isTransitioning
             ) {
                 Timber.d("Motion layout clicked")
-                viewModel.togglePlayback()
+                viewModel.togglePause()
                 true
             } else {
                 false
@@ -76,8 +76,8 @@ class MainActivity : AppCompatActivity() {
                 binding.itemCenter = centerStream
                 binding.itemBottom = bottomStream
                 initStream(binding.streamTop, topStream)
-                initStream(binding.streamCenter, centerStream)
                 initStream(binding.streamBottom, bottomStream)
+                initStream(binding.streamCenter, centerStream)
             }
         }
         binding.motionLayout.setTransitionListener(object : TransitionAdapter() {
@@ -121,24 +121,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.release()
+        viewModel.releaseAll()
     }
 
-    private fun initStream(binding: StreamItemBinding, stream: StreamModel) {
+    private fun initStream(binding: StreamItemBinding, stream: StreamViewModel) {
         binding.textureView.onReady {
-            if (stream.isActive) {
-                if (stream.isPlaying && binding.textureView.alpha != 1f) {
-                    Timber.d("Showing player")
-                    binding.textureView.animate().alpha(1f).setStartDelay(SHOW_PLAYER_DELAY).start()
-                    initBlurredBackground(binding.textureView, binding.backgroundView)
-                }
+            if (stream.isActive && stream.isPlaying && binding.textureView.alpha != 1f) {
+                Timber.d("Showing player: $stream")
+                binding.textureView.animate().alpha(1f).setStartDelay(SHOW_PLAYER_DELAY).start()
+                initBlurredBackground(binding.textureView, binding.backgroundView)
             }
             binding.textureView.scaleToFit(stream.playerParams)
-            viewModel.playerStart(stream.id, binding.textureView)
+            viewModel.initPlayer(stream.id, binding.textureView)
         }
         if (stream.isActive && stream.error != null) {
             showErrorDialog()
-            viewModel.consumeError(stream.id)
+            viewModel.consumeError()
         }
     }
 

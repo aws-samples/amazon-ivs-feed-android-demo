@@ -11,7 +11,7 @@ const val ACTIVE_TIME_UPDATE_DELAY = 60 * 1000L
 const val HEART_ANIMATION_FACTOR = 6
 const val HEART_ANIMATION_DURATION = 3 * 1000L
 const val SHOW_PLAYER_DELAY = 200L
-const val SHOW_BACKGROUND_DELAY = 300L
+const val SHOW_BACKGROUND_DELAY = 150L
 
 val HEART_COLORS = listOf(
     R.color.yellow_accent_color,

@@ -7,14 +7,14 @@
         <import type="android.view.View" />
         <variable
             name="stream"
-            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamModel" />
+            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="165dp"
         android:background="@drawable/gradient_background"
-        android:paddingBottom="@dimen/dimen_default">
+        android:paddingBottom="32dp">
 
         <TextView
             android:id="@+id/stream_title"
@@ -34,19 +34,18 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/stream_title">
+            app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
                 android:id="@+id/avatar_image"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginEnd="@dimen/dimen_default"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
                 android:contentDescription="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:loadImage="@{stream.metadata.userAvatar}"
-                tools:background="@color/orange_accent_color" />
+                app:loadImage="@{stream.metadata.userAvatar}" />
 
             <TextView
                 android:id="@+id/user_name"
@@ -89,43 +88,30 @@
                 app:layout_constraintTop_toTopOf="@+id/status"
                 tools:text="for 5m" />
 
-            <FrameLayout
+            <ImageView
                 android:id="@+id/share"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="10dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_share"
+                android:background="@drawable/bg_round_selector"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/favorite"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:contentDescription="@null"
-                    android:padding="6dp"
-                    android:src="@drawable/ic_share" />
-
-            </FrameLayout>
-
-            <FrameLayout
+            <ImageView
                 android:id="@+id/favorite"
-                android:layout_width="36dp"
-                android:layout_height="0dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="10dp"
                 android:layout_marginEnd="8dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_favorite"
+                android:background="@drawable/bg_round_selector"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:contentDescription="@null"
-                    android:padding="6dp"
-                    android:src="@drawable/ic_favorite" />
-
-            </FrameLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

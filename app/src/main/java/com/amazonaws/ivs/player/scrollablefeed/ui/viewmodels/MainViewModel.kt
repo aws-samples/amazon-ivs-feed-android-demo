@@ -4,14 +4,11 @@ import android.os.Handler
 import android.os.Looper
 import android.view.TextureView
 import androidx.lifecycle.ViewModel
-import com.amazonaws.ivs.player.MediaPlayer
-import com.amazonaws.ivs.player.Player
 import com.amazonaws.ivs.player.scrollablefeed.common.ACTIVE_TIME_UPDATE_DELAY
-import com.amazonaws.ivs.player.scrollablefeed.common.setListener
-import com.amazonaws.ivs.player.scrollablefeed.models.ErrorModel
+import com.amazonaws.ivs.player.scrollablefeed.common.asStreamViewModel
 import com.amazonaws.ivs.player.scrollablefeed.models.ScrollDirection
-import com.amazonaws.ivs.player.scrollablefeed.models.SizeModel
 import com.amazonaws.ivs.player.scrollablefeed.models.StreamModel
+import com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import timber.log.Timber
@@ -27,8 +24,8 @@ class MainViewModel(private val rawStreams: List<StreamModel>) : ViewModel() {
     }
 
     private var currentPosition = 0
-    private val _streams = MutableSharedFlow<List<StreamModel>>(replay = 1)
-    val streams: SharedFlow<List<StreamModel>> = _streams
+    private val _streams = MutableSharedFlow<List<StreamViewModel>>(replay = 1)
+    val streams: SharedFlow<List<StreamViewModel>> = _streams
     val currentSteam get() = rawStreams[currentPosition]
     var scrollDirection = ScrollDirection.NONE
         private set
@@ -38,80 +35,35 @@ class MainViewModel(private val rawStreams: List<StreamModel>) : ViewModel() {
         updateStreams()
     }
 
-    fun playerStart(streamId: Int, textureView: TextureView) {
+    fun initPlayer(streamId: Int, textureView: TextureView) {
         rawStreams.firstOrNull { it.id == streamId }?.let { stream ->
-            if (stream.player != null) {
-                stream.start(textureView)
-                return@let
+            stream.initPlayer(textureView) {
+                updateStreams()
             }
-            Timber.d("Initializing player: $streamId")
-            stream.player = MediaPlayer(textureView.context)
-            stream.player?.setListener(
-                onVideoSizeChanged = { width, height ->
-                    val params = SizeModel(width, height)
-                    if (stream.playerParams != params) {
-                        Timber.d("Video size changed: $width $height")
-                        stream.playerParams = params
-                        updateStreams()
-                    }
-                },
-                onStateChanged = { state ->
-                    if (stream.state != state) {
-                        Timber.d("State changed: $state")
-                        stream.state = state
-                        if (state == Player.State.PLAYING) {
-                            stream.isPaused = false
-                        }
-                        updateStreams()
-                    }
-                },
-                onError = { exception ->
-                    if (exception.code != 0) {
-                        Timber.d("Error happened: ${exception.code}, $exception")
-                        stream.error = ErrorModel(exception.code, exception.errorMessage)
-                        updateStreams()
-                    }
-                }
-            )
-            stream.start(textureView)
         }
     }
 
-    private fun mute(isMuted: Boolean) {
-        rawStreams.forEach { it.mute(isMuted) }
+    fun togglePause() {
+        currentSteam.togglePause()
         updateStreams()
     }
 
-    fun toggleMute() {
-        val isMuted = rawStreams.firstOrNull { it.isActive }?.isMuted ?: false
-        mute(!isMuted)
-    }
-
-    fun togglePlayback() {
-        rawStreams.firstOrNull { it.isActive }?.let { stream ->
-            if (stream.isPlaying) {
-                stream.pause()
-            } else {
-                stream.play()
-            }
-        }
-    }
+    fun toggleMute() = mute(!currentSteam.isMuted)
 
     fun play() {
-        rawStreams.forEach { it.play() }
+        currentSteam.pause(false)
+        updateStreams()
     }
 
     fun pause() {
-        rawStreams.forEach { it.pause() }
-    }
-
-    fun release() {
-        rawStreams.forEach { it.reset() }
-    }
-
-    fun consumeError(streamId: Int) {
-        rawStreams.firstOrNull { it.id == streamId }?.error = null
+        currentSteam.pause(true)
         updateStreams()
+    }
+
+    fun releaseAll() = rawStreams.forEach { it.reset() }
+
+    fun consumeError() {
+        currentSteam.error = null
     }
 
     fun scrollStreams(direction: ScrollDirection) {
@@ -125,11 +77,12 @@ class MainViewModel(private val rawStreams: List<StreamModel>) : ViewModel() {
             }
         }
         Timber.d("Feed scrolled: $direction to index: $currentPosition")
-        rawStreams.forEach { stream ->
-            stream.pause()
-            stream.isActive = false
-        }
-        rawStreams[currentPosition].isActive = true
+        updateActiveStream()
+        updateStreams()
+    }
+
+    private fun mute(isMuted: Boolean) {
+        rawStreams.forEach { it.mute(isMuted) }
         updateStreams()
     }
 
@@ -137,17 +90,24 @@ class MainViewModel(private val rawStreams: List<StreamModel>) : ViewModel() {
         timerHandler.postDelayed(timerRunnable, ACTIVE_TIME_UPDATE_DELAY)
     }
 
+    private fun updateActiveStream() {
+        rawStreams.forEachIndexed { index, stream ->
+            stream.setActive(index == currentPosition)
+        }
+    }
+
     private fun updateStreams() {
         if (rawStreams.isEmpty()) return
-        rawStreams.forEach { it.isActive = false }
-        rawStreams[currentPosition].isActive = true
-        val streams = rawStreams.map { it.copy() }
-        val streamCenter = streams[currentPosition]
-        val streamTop = if (currentPosition - 1 >= 0) streams[currentPosition - 1] else streams.last()
-        val streamBottom = if (currentPosition + 1 < streams.size) streams[currentPosition + 1] else streams.first()
-        rawStreams.filter { it.id != streamTop.id && it.id != streamCenter.id && it.id != streamBottom.id }.forEach { stream ->
+        updateActiveStream()
+        val streamTop = if (currentPosition - 1 >= 0) rawStreams[currentPosition - 1] else rawStreams.last()
+        val streamBottom = if (currentPosition + 1 < rawStreams.size) rawStreams[currentPosition + 1] else rawStreams.first()
+        rawStreams.filter { it.id != streamTop.id && it.id != currentSteam.id && it.id != streamBottom.id }.forEach { stream ->
             stream.reset()
         }
-        _streams.tryEmit(listOf(streamTop, streamCenter, streamBottom))
+        _streams.tryEmit(listOf(
+            streamTop.asStreamViewModel(),
+            currentSteam.asStreamViewModel(),
+            streamBottom.asStreamViewModel()
+        ))
     }
 }

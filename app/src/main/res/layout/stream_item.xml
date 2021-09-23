@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <variable
             name="stream"
-            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamModel" />
+            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel" />
         <variable
             name="isCenter"
             type="Boolean" />
@@ -27,7 +27,7 @@
             android:contentDescription="@null"
             android:scaleType="centerCrop"
             android:alpha="@{stream.active ? 0.35f : 0f}"
-            android:visibility="@{!isCenter ? View.INVISIBLE : stream.playing || stream.paused ? View.VISIBLE : View.INVISIBLE}" />
+            android:visibility="@{!isCenter || stream.buffering ? View.INVISIBLE : View.VISIBLE}" />
 
         <TextureView
             android:id="@+id/texture_view"
@@ -45,7 +45,8 @@
             android:layout_height="48dp"
             android:indeterminate="true"
             android:indeterminateOnly="true"
-            app:animateVisibility="@{stream.buffering ? View.VISIBLE : View.GONE}"
+            android:alpha="0"
+            app:animateVisibility="@{stream.buffering &amp;&amp; isCenter ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -66,9 +67,10 @@
             android:id="@+id/mute_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_margin="16dp"
+            android:layout_margin="8dp"
             android:padding="10dp"
             android:src="@{stream.muted ? @drawable/ic_volume_off : @drawable/ic_volume_on, default = @drawable/ic_volume_on}"
+            android:background="@drawable/bg_round_selector"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:contentDescription="@null" />
