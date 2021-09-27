@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <dimen name="dimen_default">20dp</dimen>
+    <dimen name="dimen_default">16dp</dimen>
     <dimen name="medium_text_size">14sp</dimen>
     <dimen name="big_text_size">16sp</dimen>
 
-    <!--Heart animation constants-->
     <dimen name="heart_anim_bezier_x_rand">40dp</dimen>
     <dimen name="heart_anim_init_x">50dp</dimen>
     <dimen name="heart_anim_init_y">25dp</dimen>

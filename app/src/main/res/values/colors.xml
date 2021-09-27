@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_bg_color">#16181D</color>
+    <color name="primary_bg_color">#333333</color>
     <color name="primary_color">#FFFFFF</color>
-    <color name="primary_color_dark">#1B1B1B</color>
+    <color name="primary_color_dark">#CC000000</color>
     <color name="orange_accent_color">#FF7676</color>
     <color name="white_transparent_color">#B3FFFFFF</color>
-    <color name="black_color">#000000</color>
     <color name="primary_red_accent_color">#FF5555</color>
     <color name="secondary_red_accent_color">#DC3654</color>
     <color name="transparent_color">#00000000</color>
@@ -16,4 +15,6 @@
     <color name="alert_dialog_background">#4C4E53</color>
     <color name="primary_text_color">#FFFFFF</color>
     <color name="secondary_text_color">#D7D7D7</color>
+    <color name="ripple_color">#777</color>
+    <color name="ic_launcher_background">#21242A</color>
 </resources>

@@ -4,9 +4,10 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primary_color</item>
         <item name="colorPrimaryDark">@color/primary_color_dark</item>
+        <item name="colorPrimaryVariant">@color/primary_bg_color</item>
         <item name="colorAccent">@color/orange_accent_color</item>
-        <item name="android:statusBarColor">@color/primary_bg_color</item>
-        <item name="android:navigationBarColor">@color/primary_bg_color</item>
+        <item name="android:statusBarColor">@color/primary_color_dark</item>
+        <item name="android:navigationBarColor">@color/primary_color_dark</item>
         <item name="android:windowBackground">@color/primary_bg_color</item>
     </style>
 
