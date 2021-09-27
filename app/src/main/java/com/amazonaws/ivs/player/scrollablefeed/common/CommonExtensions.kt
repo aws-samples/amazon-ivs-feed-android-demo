@@ -58,9 +58,10 @@ fun Context.readJsonAsset(fileName: String): String {
 }
 
 fun Activity.startShareIntent(title: String, url: String) {
+    val formattedString = getString(R.string.formatted_share_url, url)
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, url)
+        putExtra(Intent.EXTRA_TEXT, formattedString)
         putExtra(Intent.EXTRA_TITLE, title)
         type = "text/plain"
     }

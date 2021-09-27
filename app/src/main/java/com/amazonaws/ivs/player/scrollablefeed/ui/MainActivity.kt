@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             }
             titleView.share.setOnClickListener {
                 val stream = viewModel.currentSteam
-                startShareIntent(stream.stream.playbackUrl, stream.metadata.streamTitle)
+                startShareIntent(title = stream.metadata.streamTitle, url = stream.stream.playbackUrl)
             }
             titleView.favorite.setOnClickListener {
                 titleView.heartView.addHeart(HEART_COLORS.random())
