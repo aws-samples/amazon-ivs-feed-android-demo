@@ -5,13 +5,13 @@
     <data>
         <variable
             name="itemTop"
-            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel" />
+            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamUIModel" />
         <variable
             name="itemCenter"
-            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel" />
+            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamUIModel" />
         <variable
             name="itemBottom"
-            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel" />
+            type="com.amazonaws.ivs.player.scrollablefeed.models.StreamUIModel" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout

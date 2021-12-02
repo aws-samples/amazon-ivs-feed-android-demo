@@ -5,12 +5,12 @@ import android.os.Looper
 import android.view.TextureView
 import androidx.lifecycle.ViewModel
 import com.amazonaws.ivs.player.scrollablefeed.common.ACTIVE_TIME_UPDATE_DELAY
+import com.amazonaws.ivs.player.scrollablefeed.common.ConsumableSharedFlow
 import com.amazonaws.ivs.player.scrollablefeed.common.asStreamViewModel
 import com.amazonaws.ivs.player.scrollablefeed.models.ScrollDirection
 import com.amazonaws.ivs.player.scrollablefeed.models.StreamModel
-import com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import com.amazonaws.ivs.player.scrollablefeed.models.StreamUIModel
+import kotlinx.coroutines.flow.asSharedFlow
 import timber.log.Timber
 import java.util.*
 
@@ -24,8 +24,9 @@ class MainViewModel(private val rawStreams: List<StreamModel>) : ViewModel() {
     }
 
     private var currentPosition = 0
-    private val _streams = MutableSharedFlow<List<StreamViewModel>>(replay = 1)
-    val streams: SharedFlow<List<StreamViewModel>> = _streams
+    private val _streams = ConsumableSharedFlow<List<StreamUIModel>>(canReplay = true)
+
+    val streams = _streams.asSharedFlow()
     val currentSteam get() = rawStreams[currentPosition]
     var scrollDirection = ScrollDirection.NONE
         private set
