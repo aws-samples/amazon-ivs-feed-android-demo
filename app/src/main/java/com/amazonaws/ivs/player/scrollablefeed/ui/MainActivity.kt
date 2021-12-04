@@ -14,7 +14,7 @@ import com.amazonaws.ivs.player.scrollablefeed.models.StreamsModel
 import com.amazonaws.ivs.player.scrollablefeed.databinding.ActivityMainBinding
 import com.amazonaws.ivs.player.scrollablefeed.databinding.StreamItemBinding
 import com.amazonaws.ivs.player.scrollablefeed.models.ScrollDirection
-import com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel
+import com.amazonaws.ivs.player.scrollablefeed.models.StreamUIModel
 import com.amazonaws.ivs.player.scrollablefeed.ui.viewmodels.MainViewModel
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
             updateViewHeight(root.height)
         }
 
-        launchMain {
+        launchUI {
             viewModel.streams.collect { streams ->
                 // Lets assume that the ViewModel will always return 3 streams!
                 val topStream = streams[0]
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.releaseAll()
     }
 
-    private fun initStream(binding: StreamItemBinding, stream: StreamViewModel) {
+    private fun initStream(binding: StreamItemBinding, stream: StreamUIModel) {
         binding.textureView.onReady {
             if (stream.isActive && stream.isPlaying && binding.textureView.alpha != 1f) {
                 Timber.d("Showing player: $stream")

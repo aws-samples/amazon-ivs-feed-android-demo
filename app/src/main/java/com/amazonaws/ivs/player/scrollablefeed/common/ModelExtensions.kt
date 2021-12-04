@@ -1,9 +1,9 @@
 package com.amazonaws.ivs.player.scrollablefeed.common
 
 import com.amazonaws.ivs.player.scrollablefeed.models.StreamModel
-import com.amazonaws.ivs.player.scrollablefeed.models.StreamViewModel
+import com.amazonaws.ivs.player.scrollablefeed.models.StreamUIModel
 
-fun StreamModel.asStreamViewModel() = StreamViewModel(
+fun StreamModel.asStreamViewModel() = StreamUIModel(
     id = id,
     stream = stream,
     metadata = metadata,
