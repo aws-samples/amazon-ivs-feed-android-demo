@@ -16,7 +16,6 @@ import com.amazonaws.ivs.player.scrollablefeed.databinding.StreamItemBinding
 import com.amazonaws.ivs.player.scrollablefeed.models.ScrollDirection
 import com.amazonaws.ivs.player.scrollablefeed.models.StreamUIModel
 import com.amazonaws.ivs.player.scrollablefeed.ui.viewmodels.MainViewModel
-import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 import java.util.*
 
