@@ -3,6 +3,7 @@ package com.amazonaws.ivs.player.scrollablefeed.ui
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MotionEvent
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.constraintlayout.motion.widget.TransitionAdapter
@@ -102,10 +103,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-    }
 
-    override fun onBackPressed() {
-        finish()
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
     }
 
     override fun onResume() {
