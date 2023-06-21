@@ -4,29 +4,27 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MotionEvent
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.constraintlayout.motion.widget.TransitionAdapter
 import androidx.core.view.doOnLayout
-import com.amazonaws.ivs.player.scrollablefeed.App
 import com.amazonaws.ivs.player.scrollablefeed.R
 import com.amazonaws.ivs.player.scrollablefeed.common.*
-import com.amazonaws.ivs.player.scrollablefeed.models.StreamsModel
 import com.amazonaws.ivs.player.scrollablefeed.databinding.ActivityMainBinding
 import com.amazonaws.ivs.player.scrollablefeed.databinding.StreamItemBinding
 import com.amazonaws.ivs.player.scrollablefeed.models.ScrollDirection
 import com.amazonaws.ivs.player.scrollablefeed.models.StreamUIModel
 import com.amazonaws.ivs.player.scrollablefeed.ui.viewmodels.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.util.*
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainViewModel by lazyViewModel(
-        { application as App },
-        { MainViewModel(readJsonAsset(JSON_FILE_NAME).asObject<StreamsModel>().streams) }
-    )
+    private val viewModel by viewModels<MainViewModel>()
     private var lastTransitionTime = 0L
 
     @SuppressLint("ClickableViewAccessibility")
@@ -66,20 +64,19 @@ class MainActivity : AppCompatActivity() {
             updateViewHeight(root.height)
         }
 
-        launchUI {
-            viewModel.streams.collect { streams ->
-                // Lets assume that the ViewModel will always return 3 streams!
-                val topStream = streams[0]
-                val centerStream = streams[1]
-                val bottomStream = streams[2]
-                binding.itemTop = topStream
-                binding.itemCenter = centerStream
-                binding.itemBottom = bottomStream
-                initStream(binding.streamTop, topStream)
-                initStream(binding.streamBottom, bottomStream)
-                initStream(binding.streamCenter, centerStream)
-            }
+        collectLatest(viewModel.streams) { streams ->
+            // Lets assume that the ViewModel will always return 3 streams!
+            val topStream = streams[0]
+            val centerStream = streams[1]
+            val bottomStream = streams[2]
+            binding.itemTop = topStream
+            binding.itemCenter = centerStream
+            binding.itemBottom = bottomStream
+            initStream(binding.streamTop, topStream)
+            initStream(binding.streamBottom, bottomStream)
+            initStream(binding.streamCenter, centerStream)
         }
+
         binding.motionLayout.setTransitionListener(object : TransitionAdapter() {
             override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
                 super.onTransitionCompleted(motionLayout, currentId)
@@ -95,6 +92,7 @@ class MainActivity : AppCompatActivity() {
                         resetCenterStream()
                         motionLayout?.jumpToState(R.id.state_center)
                     }
+
                     R.id.state_bottom -> {
                         viewModel.scrollStreams(ScrollDirection.DOWN)
                         resetCenterStream()

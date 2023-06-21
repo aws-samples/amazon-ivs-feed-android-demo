@@ -5,16 +5,20 @@ import android.os.Looper
 import android.view.TextureView
 import androidx.lifecycle.ViewModel
 import com.amazonaws.ivs.player.scrollablefeed.common.ACTIVE_TIME_UPDATE_DELAY
-import com.amazonaws.ivs.player.scrollablefeed.common.ConsumableSharedFlow
 import com.amazonaws.ivs.player.scrollablefeed.common.asStreamViewModel
 import com.amazonaws.ivs.player.scrollablefeed.models.ScrollDirection
 import com.amazonaws.ivs.player.scrollablefeed.models.StreamModel
 import com.amazonaws.ivs.player.scrollablefeed.models.StreamUIModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.update
 import timber.log.Timber
-import java.util.*
+import java.util.Date
+import javax.inject.Inject
 
-class MainViewModel(private val rawStreams: List<StreamModel>) : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(private val rawStreams: List<StreamModel>) : ViewModel() {
 
     private val timerHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = Runnable {
@@ -24,7 +28,7 @@ class MainViewModel(private val rawStreams: List<StreamModel>) : ViewModel() {
     }
 
     private var currentPosition = 0
-    private val _streams = ConsumableSharedFlow<List<StreamUIModel>>(canReplay = true)
+    private val _streams = MutableStateFlow<List<StreamUIModel>>(emptyList())
 
     val streams = _streams.asSharedFlow()
     val currentSteam get() = rawStreams[currentPosition]
@@ -102,13 +106,16 @@ class MainViewModel(private val rawStreams: List<StreamModel>) : ViewModel() {
         updateActiveStream()
         val streamTop = if (currentPosition - 1 >= 0) rawStreams[currentPosition - 1] else rawStreams.last()
         val streamBottom = if (currentPosition + 1 < rawStreams.size) rawStreams[currentPosition + 1] else rawStreams.first()
-        rawStreams.filter { it.id != streamTop.id && it.id != currentSteam.id && it.id != streamBottom.id }.forEach { stream ->
-            stream.reset()
+        rawStreams.filter { it.id != streamTop.id && it.id != currentSteam.id && it.id != streamBottom.id }
+            .forEach { stream ->
+                stream.reset()
+            }
+        _streams.update {
+            listOf(
+                streamTop.asStreamViewModel(),
+                currentSteam.asStreamViewModel(),
+                streamBottom.asStreamViewModel()
+            )
         }
-        _streams.tryEmit(listOf(
-            streamTop.asStreamViewModel(),
-            currentSteam.asStreamViewModel(),
-            streamBottom.asStreamViewModel()
-        ))
     }
 }
