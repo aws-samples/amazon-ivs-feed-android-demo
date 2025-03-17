@@ -3,6 +3,7 @@ package com.amazonaws.ivs.player.scrollablefeed.common
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -10,21 +11,26 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
-import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.math.abs
-import android.graphics.drawable.BitmapDrawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Size
+import android.view.PixelCopy
+import android.view.Surface
+import android.view.TextureView
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import androidx.core.view.doOnLayout
 import com.amazonaws.ivs.player.scrollablefeed.models.SizeModel
 import kotlinx.coroutines.delay
+import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 fun initBlurredBackground(textureView: TextureView, background: ImageView) = launchMain {
@@ -33,7 +39,7 @@ fun initBlurredBackground(textureView: TextureView, background: ImageView) = lau
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         val surface = Surface(textureView.surfaceTexture!!)
         if (surface.isValid) {
-            val surfaceBitmap = Bitmap.createBitmap(textureView.width, textureView.height, Bitmap.Config.ARGB_8888)
+            val surfaceBitmap = createBitmap(textureView.width, textureView.height)
             PixelCopy.request(surface, surfaceBitmap, {
                 if (it == PixelCopy.SUCCESS) {
                     val scaledBitmap = surfaceBitmap.scaleBitmap(background.width, background.height)
@@ -47,10 +53,10 @@ fun initBlurredBackground(textureView: TextureView, background: ImageView) = lau
     }
 }
 
-fun Bitmap.blurBitmap(applicationContext: Context): Bitmap {
+fun Bitmap.blurBitmap(applicationContext: Context): Bitmap? {
     var renderScript: RenderScript? = null
     try {
-        val output = Bitmap.createBitmap(width, height, config)
+        val output = createBitmap(width, height, config!!)
         renderScript = RenderScript.create(applicationContext, RenderScript.ContextType.DEBUG)
         val inAlloc = Allocation.createFromBitmap(renderScript, this)
         val outAlloc = Allocation.createTyped(renderScript, inAlloc.type)
@@ -62,6 +68,9 @@ fun Bitmap.blurBitmap(applicationContext: Context): Bitmap {
         }
         outAlloc.copyTo(output)
         return output
+    } catch (e: Exception) {
+        Timber.w(e, "Failed to blur image")
+        return null
     } finally {
         renderScript?.finish()
     }
@@ -90,7 +99,7 @@ fun Bitmap.scaleBitmap(maxWidth: Int, maxHeight: Int): Bitmap {
             width = maxWidth
         }
     }
-    return Bitmap.createScaledBitmap(this, width, height, true)
+    return this.scale(width, height)
 }
 
 fun TextView.firstCharColor(color: Int) {
