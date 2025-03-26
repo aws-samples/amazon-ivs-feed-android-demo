@@ -40,33 +40,33 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+}
 
-    dependencies {
-        // Android
-        implementation(libs.androidx.appcompat)
-        implementation(libs.androidx.constraintlayout)
-        implementation(libs.material)
-        implementation(libs.androidx.fragment.ktx)
-        implementation(libs.androidx.lifecycle.runtime.ktx)
-        implementation(libs.androidx.exifinterface)
+dependencies {
+    // Android
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.material)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.exifinterface)
 
-        // Kotlin
-        implementation(libs.kotlinx.serialization.json)
-        implementation(libs.kotlinx.coroutines.android)
-        implementation(libs.kotlinx.coroutines.core)
+    // Kotlin
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
 
-        // Hilt
-        implementation(libs.hilt.android)
-        ksp(libs.hilt.compiler)
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
-        // Glide
-        implementation(libs.glide)
-        ksp(libs.compiler)
+    // Glide
+    implementation(libs.glide)
+    ksp(libs.compiler)
 
-        // Timber
-        implementation(libs.timber)
+    // Timber
+    implementation(libs.timber)
 
-        // Amazon IVS
-        implementation(libs.ivs.player)
-    }
+    // Amazon IVS
+    implementation(libs.ivs.player)
 }
