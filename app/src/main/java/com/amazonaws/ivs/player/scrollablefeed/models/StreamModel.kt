@@ -1,8 +1,8 @@
 package com.amazonaws.ivs.player.scrollablefeed.models
 
-import android.net.Uri
 import android.view.Surface
 import android.view.TextureView
+import androidx.core.net.toUri
 import com.amazonaws.ivs.player.MediaPlayer
 import com.amazonaws.ivs.player.Player
 import com.amazonaws.ivs.player.scrollablefeed.common.setListener
@@ -58,7 +58,7 @@ data class StreamModel(
             return
         }
         Timber.d("Initializing player: ${toString()}")
-        player = MediaPlayer(textureView.context)
+        player = MediaPlayer.Builder(textureView.context).build()
         player?.setListener(
             onVideoSizeChanged = { width, height ->
                 val params = SizeModel(width, height)
@@ -124,7 +124,7 @@ data class StreamModel(
     private fun load() {
         if (isLoaded) return
         Timber.d("Loading player: ${toString()}")
-        player?.load(Uri.parse(stream.playbackUrl))
+        player?.load(stream.playbackUrl.toUri())
         player?.pause()
         isLoaded = true
     }

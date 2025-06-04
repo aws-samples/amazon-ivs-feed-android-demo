@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import androidx.core.content.withStyledAttributes
 import com.amazonaws.ivs.player.scrollablefeed.R
 
 class HeartLayout : RelativeLayout {
@@ -23,9 +24,9 @@ class HeartLayout : RelativeLayout {
     }
 
     private fun init(attrs: AttributeSet?, defStyleAttr: Int) {
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.HeartLayout, defStyleAttr, 0)
-        animator = PathAnimator(attributes.toHeartConfig())
-        attributes.recycle()
+        context.withStyledAttributes(attrs, R.styleable.HeartLayout, defStyleAttr, 0) {
+            animator = PathAnimator(toHeartConfig())
+        }
     }
 
     fun clearAllViews() {

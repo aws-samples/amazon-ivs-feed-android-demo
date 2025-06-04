@@ -2,19 +2,23 @@ package com.amazonaws.ivs.player.scrollablefeed.common.heartview
 
 import android.content.Context
 import android.content.res.TypedArray
-import android.graphics.*
-import android.graphics.drawable.BitmapDrawable
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toDrawable
 import com.amazonaws.ivs.player.scrollablefeed.R
 import com.amazonaws.ivs.player.scrollablefeed.common.HEART_ANIMATION_DURATION
 import com.amazonaws.ivs.player.scrollablefeed.common.HEART_ANIMATION_FACTOR
 
 fun ImageView.createHeartView(color: Int): ImageView {
-    val heart: Bitmap? = context.createHeart(color)
-    setImageDrawable(BitmapDrawable(resources, heart))
+    val heart = context.createHeart(color)?.toDrawable(resources)
+    setImageDrawable(heart)
     return this
 }
 
